@@ -22,10 +22,8 @@ class KnowledgeBase(object):
     def _get_fact(self, fact):
         """INTERNAL USE ONLY
         Get the fact in the KB that is the same as the fact argument
-
         Args:
             fact (Fact): Fact we're searching for
-
         Returns:
             Fact: matching fact
         """
@@ -36,10 +34,8 @@ class KnowledgeBase(object):
     def _get_rule(self, rule):
         """INTERNAL USE ONLY
         Get the rule in the KB that is the same as the rule argument
-
         Args:
             rule (Rule): Rule we're searching for
-
         Returns:
             Rule: matching rule
         """
@@ -84,7 +80,6 @@ class KnowledgeBase(object):
 
     def kb_assert(self, fact_rule):
         """Assert a fact or rule into the KB
-
         Args:
             fact_rule (Fact or Rule): Fact or Rule we're asserting
         """
@@ -93,10 +88,8 @@ class KnowledgeBase(object):
 
     def kb_ask(self, fact):
         """Ask if a fact is in the KB
-
         Args:
             fact (Fact) - Statement to be asked (will be converted into a Fact)
-
         Returns:
             listof Bindings|False - list of Bindings if result found, False otherwise
         """
@@ -118,10 +111,8 @@ class KnowledgeBase(object):
 
     def kb_retract(self, fact_or_rule):
         """Retract a fact from the KB
-
         Args:
             fact (Fact) - Fact to be retracted
-
         Returns:
             None
         """
@@ -133,26 +124,78 @@ class KnowledgeBase(object):
     def kb_explain(self, fact_or_rule):
         """
         Explain where the fact or rule comes from
-
         Args:
             fact_or_rule (Fact or Rule) - Fact or rule to be explained
-
         Returns:
             string explaining hierarchical support from other Facts and rules
         """
-        ####################################################
-        # Student code goes here
+        explain = ''
+        if not isinstance(fact_or_rule, Rule) and not isinstance(fact_or_rule, Fact):
+            return False
 
+        elif isinstance(fact_or_rule, Rule) and fact_or_rule not in self.rules:
+            return "Rule is not in the KB"
+
+        elif isinstance(fact_or_rule, Fact) and fact_or_rule not in self.facts:
+            return "Fact is not in the KB"
+
+        else:
+            explain += self.kb_explain_helper(fact_or_rule, explain)
+
+        print(explain)
+        return explain
+
+    def kb_explain_helper(self, fact_or_rule, indent):
+
+        if isinstance(fact_or_rule, Fact):
+
+            if fact_or_rule in self.facts:
+                fact = self._get_fact(fact_or_rule)
+                explain = indent + "Fact: " + str(fact.statement) 
+                
+                if fact.asserted:
+                    explain += " ASSERTED"
+                explain += "\n"
+
+                if fact.supported_by:
+                    for pair in fact.supported_by:
+                        explain += indent + "  " + "SUPPORTED BY" + "\n"
+                        for f in pair:
+                            explain += self.kb_explain_helper(f, indent + "    ")
+                            
+                return explain
+                
+
+        else: 
+
+            if fact_or_rule in self.rules:
+                rule = self._get_rule(fact_or_rule)
+                explain = indent + "Rule: ("
+
+                for i in range(0, len(rule.lhs)):
+                    explain += str(rule.lhs[i])
+                    if i != len(fact_or_rule.lhs) - 1:
+                        explain += ", "
+                explain += ") -> " + str(rule.rhs)
+   
+                if rule.asserted:
+                    explain += " ASSERTED"
+                explain += "\n"
+                if rule.supported_by:
+                    explain += indent + "  " + "SUPPORTED BY" + "\n"
+                    for pair in rule.supported_by:
+                        for r in pair:
+                            explain += self.kb_explain_helper(r, indent + "    ")
+        
+                return explain
 
 class InferenceEngine(object):
     def fc_infer(self, fact, rule, kb):
         """Forward-chaining to infer new facts and rules
-
         Args:
             fact (Fact) - A fact from the KnowledgeBase
             rule (Rule) - A rule from the KnowledgeBase
             kb (KnowledgeBase) - A KnowledgeBase
-
         Returns:
             Nothing            
         """
