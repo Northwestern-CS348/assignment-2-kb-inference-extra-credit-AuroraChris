@@ -1,13 +1,6 @@
 TESTS WITH ERRORS 
 -------------------------------
 TESTS FAILED  
-test03 (gradingtests.UnitTests)
-Traceback (most recent call last):
-  File "/Users/k2i/academics/automatedgradingapp/app/testing/kb-inference-ec/gradingtests.py", line 73, in test03
-    self.assertEqual(self.KB.kb_explain(fact4), answer1)
-AssertionError: 'Fact: (covered B)\n  SUPPORTED BY\n    Fa[303 chars]ED\n' != 'fact: (covered B)\n  SUPPORTED BY\n    fa[303 chars]ED\n'
-Diff is 806 characters long. Set self.maxDiff to None to see it.
-
 -------------------------------
 TESTS SKIPPED 
 -------------------------------
